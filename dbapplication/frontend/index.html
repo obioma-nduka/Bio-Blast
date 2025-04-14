@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio Blast</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Add Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Bio Blast</h1>
+    </header>
+    <main>
+        <!-- Add User Form -->
+        <section class="add-user-form">
+            <h2>Add New User</h2>
+            <div class="form-group">
+                <label for="user-name-input">Name</label>
+                <input type="text" id="user-name-input" placeholder="Enter name">
+            </div>
+            <div class="form-group">
+                <label for="user-bio-input">Bio</label>
+                <input type="text" id="user-bio-input" placeholder="Enter bio">
+            </div>
+            <div class="form-group">
+                <label for="user-quote-input">Quote</label>
+                <input type="text" id="user-quote-input" placeholder="Enter quote">
+            </div>
+            <button onclick="addUser()" class="add"><i class="fas fa-plus"></i> Add User</button>
+        </section>
+
+        <!-- Users Display -->
+        <section id="user-container"></section>
+    </main>
+    <footer>
+        <p>© 2025 Bio Blast</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
