@@ -1,6 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const bcrypt = require('bcrypt');
 
 const app = express();
 app.use(express.json());
@@ -15,7 +16,7 @@ const db = new sqlite3.Database('bio.db', (err) => {
     }
 });
 
-// Create user table
+// Create user table (for profiles)
 db.run(`
     CREATE TABLE IF NOT EXISTS user (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,7 +105,37 @@ db.run(`
     }
 });
 
-// User routes
+// Create users_credentials table for authentication
+db.run(`
+    CREATE TABLE IF NOT EXISTS users_credentials (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL
+    )
+`, (err) => {
+    if (err) {
+        console.error("Error creating users_credentials table:", err.message);
+    } else {
+        console.log("Users_credentials table created or already exists");
+        db.get("SELECT COUNT(*) as count FROM users_credentials", async (err, row) => {
+            if (row.count === 0) {
+                const hashedPassword = await bcrypt.hash("password123", 10);
+                db.run("INSERT INTO users_credentials (username, password) VALUES (?, ?)", [
+                    "Admin.User", // Updated to match the required format
+                    hashedPassword
+                ], (err) => {
+                    if (err) {
+                        console.error("Error inserting default user:", err.message);
+                    } else {
+                        console.log("Default user 'Admin.User' created with password 'password123'");
+                    }
+                });
+            }
+        });
+    }
+});
+
+// User routes (for profiles)
 app.get("/api/users", (req, res) => {
     db.all("SELECT * FROM user", (err, rows) => {
         if (err) {
@@ -235,6 +266,65 @@ app.delete("/api/hobbies/:id", (req, res) => {
     });
 });
 
-app.listen(3001, () => {
-    console.log("Server running on http://localhost:3001");
+// Login route
+app.post("/api/login", (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
+    }
+    db.get("SELECT * FROM users_credentials WHERE username = ?", [username], async (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!user) {
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) {
+            return res.status(401).json({ error: "Invalid username or password" });
+        }
+        res.json({ message: "Login successful", username: user.username });
+    });
+});
+
+// Register route
+app.post("/api/register", async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
+    }
+
+    // Validate username format (e.g., Jane.Doe or Jane.doe)
+    const usernameRegex = /^[A-Z][a-z]+\.[A-Z][a-z]+$/;
+    if (!usernameRegex.test(username)) {
+        return res.status(400).json({ error: "Username must be in the format Jane.Doe or Jane.doe (e.g., First.Last)" });
+    }
+
+    // Check if username already exists
+    db.get("SELECT * FROM users_credentials WHERE username = ?", [username], async (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (user) {
+            return res.status(400).json({ error: "Username already exists" });
+        }
+
+        // Hash the password
+        try {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            // Insert the new user into the database
+            db.run("INSERT INTO users_credentials (username, password) VALUES (?, ?)", [username, hashedPassword], (err) => {
+                if (err) {
+                    return res.status(500).json({ error: err.message });
+                }
+                res.status(201).json({ message: "Registration successful", username });
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Error hashing password" });
+        }
+    });
+});
+
+app.listen(3002, () => {
+    console.log("Server running on http://localhost:3002");
 });

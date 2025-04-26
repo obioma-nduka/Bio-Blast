@@ -8,6 +8,12 @@ function showError(message) {
     }, 5000); // Hide after 5 seconds
 }
 
+// Check if user is logged in
+const loggedInUser = localStorage.getItem("loggedInUser");
+if (!loggedInUser) {
+    window.location.href = "login.html";
+}
+
 // User CRUD
 async function fetchUsers() {
     const response = await fetch("http://localhost:3001/api/users");

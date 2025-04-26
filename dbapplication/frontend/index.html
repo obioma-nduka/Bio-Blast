@@ -8,41 +8,34 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="logo">
             <h1>Bio Blast</h1>
         </div>
         <div class="nav-links">
-            <a href="login.html">Login</a>
-            <a href="register.html">Register</a>
+            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </nav>
 
     <main>
-        <!-- Add User Form -->
         <section class="add-user-form">
             <h2>Add New User</h2>
             <div class="form-group">
-                <label for="user-name-input">Name</label>
-                <input type="text" id="user-name-input" placeholder="Enter name">
+                <label for="name-input">Name</label>
+                <input type="text" id="name-input" placeholder="Enter name">
             </div>
             <div class="form-group">
-                <label for="user-bio-input">Bio</label>
-                <input type="text" id="user-bio-input" placeholder="Enter bio">
+                <label for="bio-input">Bio</label>
+                <input type="text" id="bio-input" placeholder="Enter bio">
             </div>
             <div class="form-group">
-                <label for="user-quote-input">Quote</label>
-                <input type="text" id="user-quote-input" placeholder="Enter quote">
+                <label for="quote-input">Quote</label>
+                <input type="text" id="quote-input" placeholder="Enter quote">
             </div>
-            <button onclick="addUser()" class="add"><i class="fas fa-plus"></i> Add User</button>
+            <button class="add" onclick="addUser()"><i class="fas fa-plus"></i> Add User</button>
         </section>
 
-        <!-- Error Message -->
-        <div id="error-message" class="error-message"></div>
-
-        <!-- Users Display -->
-        <section id="user-container"></section>
+        <section id="users-list"></section>
     </main>
 
     <script src="script.js"></script>

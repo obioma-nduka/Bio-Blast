@@ -38,103 +38,171 @@ main {
     max-width: 1200px;
     margin: 30px auto;
     padding: 0 20px;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center content */
 }
 
-.add-user-form, .auth-form {
+/* Enhanced Auth Form Styles (Login and Register) */
+.auth-form {
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    max-width: 400px;
+    width: 100%;
+    transition: transform 0.2s ease;
 }
 
-.add-user-form h2, .auth-form h2 {
+.auth-form:hover {
+    transform: translateY(-3px);
+}
+
+.auth-form h2 {
     color: #6B00FF;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    font-size: 28px;
+    font-weight: bold;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
     color: #333;
+    font-size: 16px;
 }
 
 .form-group input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 16px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #6B00FF;
+    box-shadow: 0 0 5px rgba(107, 0, 255, 0.3);
 }
 
 .auth-button, .add {
     background: #6B00FF;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 25px;
     border-radius: 5px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 5px;
-    margin: 10px auto;
-    transition: background 0.3s;
+    justify-content: center;
+    gap: 8px;
+    margin: 20px auto 10px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .auth-button:hover, .add:hover {
     background: #5600CC;
+    transform: scale(1.05);
+}
+
+.auth-button:active, .add:active {
+    transform: scale(0.95);
 }
 
 .auth-form p {
     text-align: center;
     margin-top: 15px;
+    color: #666;
+    font-size: 14px;
 }
 
 .auth-form p a {
     color: #6B00FF;
     text-decoration: none;
+    font-weight: bold;
 }
 
 .auth-form p a:hover {
     text-decoration: underline;
+    color: #5600CC;
 }
 
+/* Enhanced Add User Form */
+.add-user-form {
+    background: white;
+    padding: 30px; /* Match auth-form padding */
+    border-radius: 12px; /* Match auth-form border-radius */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Match auth-form shadow */
+    max-width: 400px; /* Match auth-form width */
+    width: 100%;
+    margin-bottom: 40px; /* Increased spacing */
+    transition: transform 0.2s ease; /* Add hover animation */
+}
+
+.add-user-form:hover {
+    transform: translateY(-3px); /* Match auth-form hover effect */
+}
+
+.add-user-form h2 {
+    color: #6B00FF;
+    text-align: center;
+    margin-bottom: 25px; /* Match auth-form spacing */
+    font-size: 28px; /* Match auth-form heading */
+    font-weight: bold;
+}
+
+/* Enhanced User Card */
 .user-card {
     background: white;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s;
+    border-radius: 12px; /* Match auth-form border-radius */
+    padding: 25px; /* Increased padding */
+    margin-bottom: 25px; /* Increased spacing */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Match auth-form shadow */
+    width: 100%;
+    max-width: 600px; /* Wider cards for better readability */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smoother hover effect */
 }
 
 .user-card:hover {
     transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
 }
 
 .user-card h2 {
     color: #6B00FF;
     margin-top: 0;
+    font-size: 24px; /* Larger heading */
+    font-weight: bold;
+    margin-bottom: 10px; /* Better spacing */
 }
 
 .user-card p {
-    margin: 5px 0;
+    margin: 8px 0; /* Better spacing */
+    color: #333; /* Darker text for readability */
+    font-size: 16px; /* Larger text */
+    line-height: 1.5; /* Better readability */
 }
 
 .section {
-    margin: 20px 0;
+    margin: 25px 0; /* Increased spacing */
 }
 
 .section h3 {
     color: #333;
     border-bottom: 2px solid #6B00FF;
     padding-bottom: 5px;
+    font-size: 20px; /* Larger heading */
+    margin-bottom: 15px; /* Better spacing */
 }
 
 .section ul {
@@ -144,43 +212,59 @@ main {
 
 .section ul li {
     background: #f9f9f9;
-    padding: 10px;
-    margin: 5px 0;
+    padding: 12px 15px; /* Increased padding */
+    margin: 8px 0; /* Better spacing */
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 16px; /* Larger text */
+    color: #333; /* Darker text */
+    transition: background 0.3s ease; /* Smooth background transition */
+}
+
+.section ul li:hover {
+    background: #ececec; /* Subtle hover effect */
 }
 
 .section input {
-    padding: 8px;
+    padding: 10px; /* Increased padding */
     border: 1px solid #ddd;
     border-radius: 5px;
     margin-right: 10px;
     flex: 1;
+    font-size: 16px; /* Larger text */
 }
 
 .button-group {
     display: flex;
     gap: 10px;
     justify-content: center;
+    margin-top: 15px; /* Better spacing */
 }
 
 .edit, .delete, .add {
     background: #6B00FF;
     color: white;
     border: none;
-    padding: 8px 15px;
+    padding: 10px 20px; /* Increased padding */
     border-radius: 5px;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 5px;
-    transition: background 0.3s;
+    font-size: 14px; /* Slightly larger text */
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease; /* Add transform animation */
 }
 
 .edit:hover, .add:hover {
     background: #5600CC;
+    transform: scale(1.05); /* Slight scale-up on hover */
+}
+
+.edit:active, .add:active {
+    transform: scale(0.95); /* Slight press effect */
 }
 
 .delete {
@@ -189,6 +273,11 @@ main {
 
 .delete:hover {
     background: #CC0000;
+    transform: scale(1.05); /* Add hover animation */
+}
+
+.delete:active {
+    transform: scale(0.95); /* Add press effect */
 }
 
 .error-message {
@@ -201,12 +290,14 @@ main {
     text-align: center;
 }
 
-.loading {
-    text-align: center;
-    font-size: 18px;
-    color: #6B00FF;
+.success-message {
+    background: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
     margin: 20px 0;
     display: none;
+    text-align: center;
 }
 
 @media (max-width: 600px) {
@@ -230,5 +321,10 @@ main {
 
     .button-group {
         flex-direction: column;
+    }
+
+    .auth-form, .add-user-form, .user-card {
+        padding: 20px; /* Slightly less padding on mobile */
+        margin: 20px; /* Ensure it doesn't touch the edges */
     }
 }
