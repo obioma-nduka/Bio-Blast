@@ -12,10 +12,17 @@ Bio Blast is a web application that allows users to create, read, update, and de
 - Add/edit/delete users, study groups, and hobbies via the UI.
 - Add records via HTTP (e.g., `curl`).
 - Colorful, mobile-friendly UI based on a Figma prototype.
+- Navigation bar with links to "Login" and "Register" pages (placeholder pages for future authentication).
+- Improved error handling with on-screen messages.
 
 ## Project Structure
 
 - `frontend/`: HTML, CSS, JavaScript for the UI.
+ - `index.html`: Main page for managing user profiles.
+ - `login.html`: Placeholder login page.
+ - `register.html`: Placeholder registration page.
+ - `style.css`: Styles for the UI.
+ - `script.js`: JavaScript for CRUD operations.
 - `backend/`: Node.js, Express, SQLite for the server and database.
 
 ## Setup and Run
@@ -49,9 +56,12 @@ npm start
 
 
 
-4. Open `http://localhost:3000` in your browser to view the app.
+4. Open `http://localhost:3001` in your browser to view the app.
 
 ## Usage
+**Home**: Access the main page at http://localhost:3001 to manage user profiles.
+**Login**: Navigate to the login page (placeholder) to log in (functionality coming soon).
+**Register**: Navigate to the registration page (placeholder) to create a new account (functionality coming soon).
 
 ### Via the UI
 
