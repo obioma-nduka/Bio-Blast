@@ -1,20 +1,27 @@
+// Function to display error messages
+function showError(message) {
+    const errorDiv = document.getElementById("error-message");
+    errorDiv.textContent = message;
+    errorDiv.style.display = "block";
+    setTimeout(() => {
+        errorDiv.style.display = "none";
+    }, 5000); // Hide after 5 seconds
+}
+
 // User CRUD
 async function fetchUsers() {
-    const response = await fetch("/api/users");
-    const data = await response.json();
-    return data;
+    const response = await fetch("http://localhost:3001/api/users");
+    return response.json();
 }
 
 async function fetchStudyGroups(userId) {
-    const response = await fetch(`/api/study-groups/${userId}`);
-    const data = await response.json();
-    return data;
+    const response = await fetch(`http://localhost:3001/api/study-groups/${userId}`);
+    return response.json();
 }
 
 async function fetchHobbies(userId) {
-    const response = await fetch(`/api/hobbies/${userId}`);
-    const data = await response.json();
-    return data;
+    const response = await fetch(`http://localhost:3001/api/hobbies/${userId}`);
+    return response.json();
 }
 
 async function displayUsers() {
@@ -75,10 +82,10 @@ async function addUser() {
     const bio = bioInput.value.trim();
     const quote = quoteInput.value.trim();
     if (!name) {
-        alert("Please enter a name!");
+        showError("Please enter a name!");
         return;
     }
-    const response = await fetch("/api/users", {
+    const response = await fetch("http://localhost:3001/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, bio, quote }),
@@ -89,7 +96,7 @@ async function addUser() {
         quoteInput.value = "";
         displayUsers();
     } else {
-        alert("Failed to add user");
+        showError("Failed to add user");
     }
 }
 
@@ -100,7 +107,7 @@ async function editUser(id) {
     const newBio = prompt("Edit bio:", user.bio);
     const newQuote = prompt("Edit quote:", user.quote);
     if (newName && newName.trim()) {
-        const response = await fetch(`/api/users/${id}`, {
+        const response = await fetch(`http://localhost:3001/api/users/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: newName.trim(), bio: newBio || "", quote: newQuote || "" }),
@@ -108,20 +115,20 @@ async function editUser(id) {
         if (response.ok) {
             displayUsers();
         } else {
-            alert("Failed to update user");
+            showError("Failed to update user");
         }
     }
 }
 
 async function deleteUser(id) {
     if (confirm("Delete this user?")) {
-        const response = await fetch(`/api/users/${id}`, {
+        const response = await fetch(`http://localhost:3001/api/users/${id}`, {
             method: "DELETE",
         });
         if (response.ok) {
             displayUsers();
         } else {
-            alert("Failed to delete user");
+            showError("Failed to delete user");
         }
     }
 }
@@ -130,10 +137,10 @@ async function addStudyGroup(userId) {
     const input = document.getElementById(`study-input-${userId}`);
     const newGroup = input.value.trim();
     if (!newGroup) {
-        alert("Please enter a study group!");
+        showError("Please enter a study group!");
         return;
     }
-    const response = await fetch("/api/study-groups", {
+    const response = await fetch("http://localhost:3001/api/study-groups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, name: newGroup }),
@@ -142,19 +149,19 @@ async function addStudyGroup(userId) {
         input.value = "";
         displayUsers();
     } else {
-        alert("Failed to add study group");
+        showError("Failed to add study group");
     }
 }
 
 async function deleteStudyGroup(id, userId) {
     if (confirm("Delete this study group?")) {
-        const response = await fetch(`/api/study-groups/${id}`, {
+        const response = await fetch(`http://localhost:3001/api/study-groups/${id}`, {
             method: "DELETE",
         });
         if (response.ok) {
             displayUsers();
         } else {
-            alert("Failed to delete study group");
+            showError("Failed to delete study group");
         }
     }
 }
@@ -163,10 +170,10 @@ async function addHobby(userId) {
     const input = document.getElementById(`hobby-input-${userId}`);
     const newHobby = input.value.trim();
     if (!newHobby) {
-        alert("Please enter a hobby!");
+        showError("Please enter a hobby!");
         return;
     }
-    const response = await fetch("/api/hobbies", {
+    const response = await fetch("http://localhost:3001/api/hobbies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: userId, name: newHobby }),
@@ -175,14 +182,14 @@ async function addHobby(userId) {
         input.value = "";
         displayUsers();
     } else {
-        alert("Failed to add hobby");
+        showError("Failed to add hobby");
     }
 }
 
 async function editHobby(id, userId) {
     const newHobby = prompt("Edit hobby:");
     if (newHobby && newHobby.trim()) {
-        const response = await fetch(`/api/hobbies/${id}`, {
+        const response = await fetch(`http://localhost:3001/api/hobbies/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ name: newHobby.trim() }),
@@ -190,20 +197,20 @@ async function editHobby(id, userId) {
         if (response.ok) {
             displayUsers();
         } else {
-            alert("Failed to edit hobby");
+            showError("Failed to edit hobby");
         }
     }
 }
 
 async function deleteHobby(id, userId) {
     if (confirm("Delete this hobby?")) {
-        const response = await fetch(`/api/hobbies/${id}`, {
+        const response = await fetch(`http://localhost:3001/api/hobbies/${id}`, {
             method: "DELETE",
         });
         if (response.ok) {
             displayUsers();
         } else {
-            alert("Failed to delete hobby");
+            showError("Failed to delete hobby");
         }
     }
 }

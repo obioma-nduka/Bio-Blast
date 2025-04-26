@@ -5,13 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bio Blast</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Add Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
-    <header>
-        <h1>Bio Blast</h1>
-    </header>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>Bio Blast</h1>
+        </div>
+        <div class="nav-links">
+            <a href="login.html">Login</a>
+            <a href="register.html">Register</a>
+        </div>
+    </nav>
+
     <main>
         <!-- Add User Form -->
         <section class="add-user-form">
@@ -31,12 +38,13 @@
             <button onclick="addUser()" class="add"><i class="fas fa-plus"></i> Add User</button>
         </section>
 
+        <!-- Error Message -->
+        <div id="error-message" class="error-message"></div>
+
         <!-- Users Display -->
         <section id="user-container"></section>
     </main>
-    <footer>
-        <p>© 2025 Bio Blast</p>
-    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>

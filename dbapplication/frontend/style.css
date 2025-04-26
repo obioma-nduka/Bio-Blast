@@ -1,125 +1,57 @@
 body {
-    background: linear-gradient(135deg, #1a1a3d, #4b0082, #ff007f);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    color: #ffffff;
 }
 
-header {
-    text-align: center;
-    padding: 40px 15px;
-    background: linear-gradient(90deg, #6B00FF, #C800FF);
+/* Navigation Bar Styles */
+.navbar {
+    background: #6B00FF;
     color: white;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-}
-
-h1 {
-    font-size: 42px;
-    margin: 0;
-    letter-spacing: 2px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-main {
-    width: 90%;
-    max-width: 900px;
-    margin: 40px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.user-card {
-    background: linear-gradient(145deg, #ffffff, #e6e6ff);
-    color: #222;
-    border-left: 10px solid #6B00FF;
-    border-radius: 15px;
-    padding: 25px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.user-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
-}
-
-.user-card h2 {
-    color: #6B00FF;
-    font-size: 28px;
-    margin: 0 0 15px;
-    border-bottom: 2px solid #FF007F;
-    padding-bottom: 5px;
-}
-
-.user-card p {
-    margin: 10px 0;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-.user-card p strong {
-    color: #FF007F;
-}
-
-.section {
-    margin-top: 25px;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.section h3 {
-    color: #C800FF;
-    font-size: 20px;
-    margin: 0 0 10px;
-}
-
-.section.study-groups {
-    background: #e5d6ff;
-}
-
-.section.hobbies {
-    background: #ffe5cc;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0;
-}
-
-li {
+    padding: 15px 30px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f0f0f0;
-    border-radius: 8px;
-    padding: 8px 12px;
-    margin: 8px 0;
-    font-size: 15px;
-    transition: background 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-li:hover {
-    background: #e0e0e0;
+.navbar .logo h1 {
+    margin: 0;
+    font-size: 24px;
 }
 
-.add-user-form {
-    background: linear-gradient(145deg, #ffe5f5, #ffd6f0);
-    padding: 30px;
-    border-radius: 15px;
-    border: 3px solid #C800FF;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+.navbar .nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 16px;
+    transition: color 0.3s;
 }
 
-.add-user-form h2 {
-    color: #C800FF;
-    font-size: 26px;
-    margin-bottom: 20px;
+.navbar .nav-links a:hover {
+    color: #FFD700;
+}
+
+main {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.add-user-form, .auth-form {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.add-user-form h2, .auth-form h2 {
+    color: #6B00FF;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .form-group {
@@ -128,75 +60,175 @@ li:hover {
 
 .form-group label {
     display: block;
-    font-size: 14px;
-    color: #6B00FF;
     margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
 }
 
-input {
+.form-group input {
     width: 100%;
-    padding: 12px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
     font-size: 16px;
-    border: 2px solid #C800FF;
-    border-radius: 8px;
-    margin: 0;
-    box-sizing: border-box;
-    background: #fff;
-    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
-input:focus {
-    border-color: #FF007F;
-    box-shadow: 0 0 8px rgba(255, 0, 127, 0.3);
-    outline: none;
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 15px;
+.auth-button, .add {
+    background: #6B00FF;
+    color: white;
     border: none;
-    border-radius: 8px;
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
-    margin: 5px 5px 0 0;
-    transition: all 0.3s ease;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 5px;
+    margin: 10px auto;
+    transition: background 0.3s;
 }
 
-button.add {
-    background: linear-gradient(90deg, #00D084, #00A05A);
-    color: white;
+.auth-button:hover, .add:hover {
+    background: #5600CC;
 }
 
-button.edit {
-    background: linear-gradient(90deg, #00BFFF, #009ACD);
-    color: white;
-}
-
-button.delete {
-    background: linear-gradient(90deg, #FF4D4D, #D43F3F);
-    color: white;
-}
-
-button:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
-}
-
-button i {
-    font-size: 14px;
-}
-
-footer {
+.auth-form p {
     text-align: center;
-    padding: 20px;
-    background: #1a1a3d;
-    color: #aaa;
-    font-size: 14px;
-    margin-top: 40px;
+    margin-top: 15px;
 }
 
-footer p {
-    margin: 0;
+.auth-form p a {
+    color: #6B00FF;
+    text-decoration: none;
+}
+
+.auth-form p a:hover {
+    text-decoration: underline;
+}
+
+.user-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+}
+
+.user-card h2 {
+    color: #6B00FF;
+    margin-top: 0;
+}
+
+.user-card p {
+    margin: 5px 0;
+}
+
+.section {
+    margin: 20px 0;
+}
+
+.section h3 {
+    color: #333;
+    border-bottom: 2px solid #6B00FF;
+    padding-bottom: 5px;
+}
+
+.section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.section ul li {
+    background: #f9f9f9;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-right: 10px;
+    flex: 1;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.edit, .delete, .add {
+    background: #6B00FF;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.3s;
+}
+
+.edit:hover, .add:hover {
+    background: #5600CC;
+}
+
+.delete {
+    background: #FF4D4D;
+}
+
+.delete:hover {
+    background: #CC0000;
+}
+
+.error-message {
+    background: #ff4d4d;
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 20px 0;
+    display: none;
+    text-align: center;
+}
+
+.loading {
+    text-align: center;
+    font-size: 18px;
+    color: #6B00FF;
+    margin: 20px 0;
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .navbar .nav-links a {
+        margin-left: 10px;
+    }
+
+    .section ul li {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .section input {
+        margin-bottom: 10px;
+    }
+
+    .button-group {
+        flex-direction: column;
+    }
 }

@@ -1,17 +1,15 @@
-const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
-const path = require("path");
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
 const app = express();
-
-// Serve static files from the frontend folder
-app.use(express.static(path.join(__dirname, "../frontend")));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Connect to SQLite database
-const db = new sqlite3.Database("./bio.db", (err) => {
+// SQLite database setup
+const db = new sqlite3.Database('bio.db', (err) => {
     if (err) {
-        console.error("Error connecting to database:", err.message);
+        console.error("Error connecting to SQLite database:", err.message);
     } else {
         console.log("Connected to SQLite database");
     }
@@ -47,6 +45,11 @@ db.run(`
                     "Data Engineer",
                     "Code everyday"
                 ]);
+                db.run("INSERT INTO user (name, bio, quote) VALUES (?, ?, ?)", [
+                    "Michael Shodamola",
+                    "Software Engineer",
+                    "...by the yard it's hard, but inch by inch anything is cinch"
+                ]);
             }
         });
     }
@@ -70,6 +73,7 @@ db.run(`
                 db.run("INSERT INTO study_groups (user_id, name) VALUES (?, ?)", [1, "NITS23K"]);
                 db.run("INSERT INTO study_groups (user_id, name) VALUES (?, ?)", [2, "NITS23K"]);
                 db.run("INSERT INTO study_groups (user_id, name) VALUES (?, ?)", [3, "NITS23K"]);
+                db.run("INSERT INTO study_groups (user_id, name) VALUES (?, ?)", [4, "NITS23K"]);
             }
         });
     }
@@ -94,14 +98,15 @@ db.run(`
                 db.run("INSERT INTO hobbies (user_id, name) VALUES (?, ?)", [2, "Taking Walks"]);
                 db.run("INSERT INTO hobbies (user_id, name) VALUES (?, ?)", [3, "Football"]);
                 db.run("INSERT INTO hobbies (user_id, name) VALUES (?, ?)", [3, "Cycling"]);
+                db.run("INSERT INTO hobbies (user_id, name) VALUES (?, ?)", [4, "playing basketball"]);
             }
         });
     }
 });
 
-// API to get all users (READ)
+// User routes
 app.get("/api/users", (req, res) => {
-    db.all("SELECT * FROM user", [], (err, rows) => {
+    db.all("SELECT * FROM user", (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -109,13 +114,12 @@ app.get("/api/users", (req, res) => {
     });
 });
 
-// API to create a new user (CREATE)
 app.post("/api/users", (req, res) => {
     const { name, bio, quote } = req.body;
     if (!name) {
         return res.status(400).json({ error: "Name is required" });
     }
-    db.run("INSERT INTO user (name, bio, quote) VALUES (?, ?, ?)", [name, bio || "", quote || ""], function (err) {
+    db.run("INSERT INTO user (name, bio, quote) VALUES (?, ?, ?)", [name, bio, quote], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -123,42 +127,33 @@ app.post("/api/users", (req, res) => {
     });
 });
 
-// API to update a user (UPDATE)
 app.put("/api/users/:id", (req, res) => {
     const id = req.params.id;
     const { name, bio, quote } = req.body;
     if (!name) {
         return res.status(400).json({ error: "Name is required" });
     }
-    db.run("UPDATE user SET name = ?, bio = ?, quote = ? WHERE id = ?", [name, bio || "", quote || "", id], function (err) {
+    db.run("UPDATE user SET name = ?, bio = ?, quote = ? WHERE id = ?", [name, bio, quote, id], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "User not found" });
         }
         res.json({ message: "User updated" });
     });
 });
 
-// API to delete a user (DELETE)
 app.delete("/api/users/:id", (req, res) => {
     const id = req.params.id;
-    db.run("DELETE FROM user WHERE id = ?", id, function (err) {
+    db.run("DELETE FROM user WHERE id = ?", [id], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "User not found" });
-        }
-        // Also delete associated study groups and hobbies
-        db.run("DELETE FROM study_groups WHERE user_id = ?", id);
-        db.run("DELETE FROM hobbies WHERE user_id = ?", id);
+        db.run("DELETE FROM study_groups WHERE user_id = ?", [id]);
+        db.run("DELETE FROM hobbies WHERE user_id = ?", [id]);
         res.json({ message: "User deleted" });
     });
 });
 
-// API to get study groups for a user (READ)
+// Study Group routes
 app.get("/api/study-groups/:userId", (req, res) => {
     const userId = req.params.userId;
     db.all("SELECT * FROM study_groups WHERE user_id = ?", [userId], (err, rows) => {
@@ -169,13 +164,12 @@ app.get("/api/study-groups/:userId", (req, res) => {
     });
 });
 
-// API to create a new study group for a user (CREATE)
 app.post("/api/study-groups", (req, res) => {
     const { user_id, name } = req.body;
     if (!user_id || !name) {
-        return res.status(400).json({ error: "User ID and study group name are required" });
+        return res.status(400).json({ error: "user_id and name are required" });
     }
-    db.run("INSERT INTO study_groups (user_id, name) VALUES (?, ?)", [user_id, name], function (err) {
+    db.run("INSERT INTO study_groups (user_id, name) VALUES (?, ?)", [user_id, name], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
@@ -183,21 +177,17 @@ app.post("/api/study-groups", (req, res) => {
     });
 });
 
-// API to delete a study group (DELETE)
 app.delete("/api/study-groups/:id", (req, res) => {
     const id = req.params.id;
-    db.run("DELETE FROM study_groups WHERE id = ?", id, function (err) {
+    db.run("DELETE FROM study_groups WHERE id = ?", [id], function(err) {
         if (err) {
-            return res.status(500).json({ error: "Study group not found" });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "Study group not found" });
+            return res.status(500).json({ error: err.message });
         }
         res.json({ message: "Study group deleted" });
     });
 });
 
-// API to get hobbies for a user (READ)
+// Hobbies routes
 app.get("/api/hobbies/:userId", (req, res) => {
     const userId = req.params.userId;
     db.all("SELECT * FROM hobbies WHERE user_id = ?", [userId], (err, rows) => {
@@ -208,55 +198,43 @@ app.get("/api/hobbies/:userId", (req, res) => {
     });
 });
 
-// API to create a new hobby for a user (CREATE)
 app.post("/api/hobbies", (req, res) => {
     const { user_id, name } = req.body;
     if (!user_id || !name) {
-        return res.status(400).json({ error: "User ID and hobby name are required" });
+        return res.status(400).json({ error: "user_id and name are required" });
     }
-    db.run("INSERT INTO hobbies (user_id, name) VALUES (?, ?)", [user_id, name], function (err) {
+    db.run("INSERT INTO hobbies (user_id, name) VALUES (?, ?)", [user_id, name], function(err) {
         if (err) {
-            return res.status(500).json({ error: "Hobby not found" });
+            return res.status(500).json({ error: err.message });
         }
         res.json({ id: this.lastID, user_id, name });
     });
 });
 
-// API to update a hobby (UPDATE)
 app.put("/api/hobbies/:id", (req, res) => {
     const id = req.params.id;
     const { name } = req.body;
     if (!name) {
         return res.status(400).json({ error: "Hobby name is required" });
     }
-    db.run("UPDATE hobbies SET name = ? WHERE id = ?", [name, id], function (err) {
+    db.run("UPDATE hobbies SET name = ? WHERE id = ?", [name, id], function(err) {
         if (err) {
             return res.status(500).json({ error: err.message });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "Hobby not found" });
         }
         res.json({ message: "Hobby updated" });
     });
 });
 
-// API to delete a hobby (DELETE)
 app.delete("/api/hobbies/:id", (req, res) => {
     const id = req.params.id;
-    db.run("DELETE FROM hobbies WHERE id = ?", id, function (err) {
+    db.run("DELETE FROM hobbies WHERE id = ?", [id], function(err) {
         if (err) {
-            return res.status(500).json({ error: "Hobby not found" });
-        }
-        if (this.changes === 0) {
-            return res.status(404).json({ error: "Hobby not found" });
+            return res.status(500).json({ error: err.message });
         }
         res.json({ message: "Hobby deleted" });
     });
 });
 
-// Start the server
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.listen(3001, () => {
+    console.log("Server running on http://localhost:3001");
 });
-
