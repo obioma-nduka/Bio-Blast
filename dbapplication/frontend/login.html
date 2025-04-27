@@ -100,11 +100,13 @@
             }, 5000);
         }
 
-        // Check if the user was redirected from registration
+        // Check for redirect reason or registration success
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get("registered") === "true") {
                 showSuccess("Registration successful! Please log in.");
+            } else if (urlParams.get("redirectReason") === "unauthenticated") {
+                showError("Please log in to access the dashboard.");
             }
         };
 
@@ -120,6 +122,9 @@
                 showError("Please fill in all fields!");
                 return;
             }
+
+            // Show a notification that the form was filled
+            showSuccess("Login form filled successfully!");
 
             const response = await fetch("http://localhost:3002/api/login", {
                 method: "POST",

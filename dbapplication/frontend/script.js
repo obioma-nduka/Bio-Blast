@@ -2,24 +2,28 @@
 function showError(message) {
     const errorDiv = document.getElementById("error-message");
     const successDiv = document.getElementById("success-message");
-    errorDiv.textContent = message;
-    errorDiv.style.display = "block";
-    successDiv.style.display = "none";
-    setTimeout(() => {
-        errorDiv.style.display = "none";
-    }, 5000);
+    if (errorDiv) {
+        errorDiv.textContent = message;
+        errorDiv.style.display = "block";
+        successDiv.style.display = "none";
+        setTimeout(() => {
+            errorDiv.style.display = "none";
+        }, 5000);
+    }
 }
 
 // Function to display success messages
 function showSuccess(message) {
     const errorDiv = document.getElementById("error-message");
     const successDiv = document.getElementById("success-message");
-    successDiv.textContent = message;
-    successDiv.style.display = "block";
-    errorDiv.style.display = "none";
-    setTimeout(() => {
-        successDiv.style.display = "none";
-    }, 5000);
+    if (successDiv) {
+        successDiv.textContent = message;
+        successDiv.style.display = "block";
+        errorDiv.style.display = "none";
+        setTimeout(() => {
+            successDiv.style.display = "none";
+        }, 5000);
+    }
 }
 
 // Function to load users from the server
@@ -104,6 +108,11 @@ async function addUser() {
         return;
     }
 
+    // Show a notification that the form was filled
+    if (bio || quote) {
+        showSuccess("User form filled successfully!");
+    }
+
     const response = await fetch("http://localhost:3002/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -129,6 +138,11 @@ async function editUser(id) {
     if (!name) {
         showError("Name is required!");
         return;
+    }
+
+    // Show a notification that the form was filled
+    if (bio || quote) {
+        showSuccess("Edit user form filled successfully!");
     }
 
     const response = await fetch(`http://localhost:3002/api/users/${id}`, {
@@ -170,6 +184,9 @@ async function addStudyGroup(userId) {
         return;
     }
 
+    // Show a notification that the form was filled
+    showSuccess("Study group form filled successfully!");
+
     const response = await fetch("http://localhost:3002/api/study-groups", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -210,6 +227,9 @@ async function addHobby(userId) {
         return;
     }
 
+    // Show a notification that the form was filled
+    showSuccess("Hobby form filled successfully!");
+
     const response = await fetch("http://localhost:3002/api/hobbies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -232,6 +252,9 @@ async function editHobby(id, userId) {
         showError("Hobby name is required!");
         return;
     }
+
+    // Show a notification that the form was filled
+    showSuccess("Edit hobby form filled successfully!");
 
     const response = await fetch(`http://localhost:3002/api/hobbies/${id}`, {
         method: "PUT",
