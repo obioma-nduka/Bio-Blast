@@ -13,8 +13,7 @@
             <h1>Bio Blast</h1>
         </div>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="login.html">Login</a>
+            <!-- Navigation links will be dynamically added -->
         </div>
     </nav>
 
@@ -24,6 +23,10 @@
             <div class="form-group">
                 <label for="username-input">Username (e.g., Jane.Doe)</label>
                 <input type="text" id="username-input" placeholder="Enter username (e.g., Jane.Doe)">
+            </div>
+            <div class="form-group">
+                <label for="email-input">Email</label>
+                <input type="email" id="email-input" placeholder="Enter email">
             </div>
             <div class="form-group">
                 <label for="password-input">Password</label>
@@ -42,6 +45,45 @@
     </main>
 
     <script>
+        // Function to render the navigation bar based on login status
+        function renderNavigation() {
+            const loggedInUser = localStorage.getItem("loggedInUser");
+            const navLinks = document.querySelector(".nav-links");
+
+            if (loggedInUser) {
+                navLinks.innerHTML = `
+                    <a href="index.html">Dashboard</a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                `;
+            } else {
+                navLinks.innerHTML = `
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                `;
+            }
+        }
+
+        // Function to log out
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            const successDiv = document.getElementById("success-message");
+            if (successDiv) {
+                successDiv.textContent = "Logged out successfully!";
+                successDiv.style.display = "block";
+                setTimeout(() => {
+                    successDiv.style.display = "none";
+                }, 5000);
+            }
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+        }
+
+        // Call renderNavigation on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderNavigation();
+        });
+
         // Function to display error messages
         function showError(message) {
             const errorDiv = document.getElementById("error-message");
@@ -72,17 +114,25 @@
             return usernameRegex.test(username);
         }
 
+        // Function to validate email format
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
         // Register function
         async function register() {
             const usernameInput = document.getElementById("username-input");
+            const emailInput = document.getElementById("email-input");
             const passwordInput = document.getElementById("password-input");
             const confirmPasswordInput = document.getElementById("confirm-password-input");
             const username = usernameInput.value.trim();
+            const email = emailInput.value.trim();
             const password = passwordInput.value.trim();
             const confirmPassword = confirmPasswordInput.value.trim();
 
             // Validate inputs
-            if (!username || !password || !confirmPassword) {
+            if (!username || !email || !password || !confirmPassword) {
                 showError("Please fill in all fields!");
                 return;
             }
@@ -90,6 +140,12 @@
             // Validate username format
             if (!validateUsername(username)) {
                 showError("Username must be in the format Jane.Doe or Jane.doe (e.g., First.Last)");
+                return;
+            }
+
+            // Validate email format
+            if (!validateEmail(email)) {
+                showError("Please enter a valid email address");
                 return;
             }
 
@@ -102,13 +158,14 @@
             const response = await fetch("http://localhost:3002/api/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username, password }),
+                body: JSON.stringify({ username, email, password }),
             });
 
             const data = await response.json();
             if (response.ok) {
                 showSuccess("Registration successful! Redirecting to login...");
                 usernameInput.value = "";
+                emailInput.value = "";
                 passwordInput.value = "";
                 confirmPasswordInput.value = "";
                 setTimeout(() => {

@@ -13,8 +13,7 @@
             <h1>Bio Blast</h1>
         </div>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <a href="register.html">Register</a>
+            <!-- Navigation links will be dynamically added -->
         </div>
     </nav>
 
@@ -23,7 +22,7 @@
             <h2>Login</h2>
             <div class="form-group">
                 <label for="username-input">Username</label>
-                <input type="text" id="username-input" placeholder="Enter username">
+                <input type="text" id="username-input" placeholder="Enter username (e.g., Jane.Doe)">
             </div>
             <div class="form-group">
                 <label for="password-input">Password</label>
@@ -38,6 +37,45 @@
     </main>
 
     <script>
+        // Function to render the navigation bar based on login status
+        function renderNavigation() {
+            const loggedInUser = localStorage.getItem("loggedInUser");
+            const navLinks = document.querySelector(".nav-links");
+
+            if (loggedInUser) {
+                navLinks.innerHTML = `
+                    <a href="index.html">Dashboard</a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                `;
+            } else {
+                navLinks.innerHTML = `
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                `;
+            }
+        }
+
+        // Function to log out
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            const successDiv = document.getElementById("success-message");
+            if (successDiv) {
+                successDiv.textContent = "Logged out successfully!";
+                successDiv.style.display = "block";
+                setTimeout(() => {
+                    successDiv.style.display = "none";
+                }, 5000);
+            }
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+        }
+
+        // Call renderNavigation on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderNavigation();
+        });
+
         // Function to display error messages
         function showError(message) {
             const errorDiv = document.getElementById("error-message");
@@ -62,8 +100,8 @@
             }, 5000);
         }
 
-        // Check for success message on page load
-        window.onload = () => {
+        // Check if the user was redirected from registration
+        window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get("registered") === "true") {
                 showSuccess("Registration successful! Please log in.");
@@ -77,8 +115,9 @@
             const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
 
+            // Validate inputs
             if (!username || !password) {
-                showError("Please enter both username and password!");
+                showError("Please fill in all fields!");
                 return;
             }
 
@@ -90,8 +129,13 @@
 
             const data = await response.json();
             if (response.ok) {
+                showSuccess("Login successful! Redirecting...");
+                usernameInput.value = "";
+                passwordInput.value = "";
                 localStorage.setItem("loggedInUser", username);
-                window.location.href = "index.html";
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 2000);
             } else {
                 showError(data.error || "Login failed");
             }

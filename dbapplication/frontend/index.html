@@ -6,6 +6,16 @@
     <title>Bio Blast</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script>
+        // Check authentication as early as possible
+        (function() {
+            const loggedInUser = localStorage.getItem("loggedInUser");
+            if (!loggedInUser) {
+                // Redirect to login.html with a message
+                window.location.href = "login.html?redirectReason=unauthenticated";
+            }
+        })();
+    </script>
 </head>
 <body>
     <nav class="navbar">
@@ -13,7 +23,7 @@
             <h1>Bio Blast</h1>
         </div>
         <div class="nav-links">
-            <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <!-- Navigation links will be dynamically added -->
         </div>
     </nav>
 
@@ -39,5 +49,47 @@
     </main>
 
     <script src="script.js"></script>
+    <script>
+        // Function to render the navigation bar based on login status
+        function renderNavigation() {
+            const loggedInUser = localStorage.getItem("loggedInUser");
+            const navLinks = document.querySelector(".nav-links");
+
+            if (loggedInUser) {
+                navLinks.innerHTML = `
+                    <a href="index.html">Dashboard</a>
+                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                `;
+            } else {
+                navLinks.innerHTML = `
+                    <a href="login.html">Login</a>
+                    <a href="register.html">Register</a>
+                `;
+            }
+        }
+
+        // Function to log out
+        function logout() {
+            localStorage.removeItem("loggedInUser");
+            const successDiv = document.getElementById("success-message");
+            if (successDiv) {
+                successDiv.textContent = "Logged out successfully!";
+                successDiv.style.display = "block";
+                setTimeout(() => {
+                    successDiv.style.display = "none";
+                }, 5000);
+            }
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1000);
+        }
+
+        // Call renderNavigation on page load
+        document.addEventListener("DOMContentLoaded", () => {
+            renderNavigation();
+            // Since the early check already redirected unauthenticated users, we can safely load users
+            loadUsers();
+        });
+    </script>
 </body>
 </html>
