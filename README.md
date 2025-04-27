@@ -1,162 +1,119 @@
+Of course! Here's your **README.md** based on the information you shared:
+
+---
+
 # Bio Blast
 
-A full-stack web app to manage user profiles with CRUD, using SQLite.
+**Bio Blast** is a web application designed to manage user profiles, including their bios, quotes, study groups, and hobbies. Users can register, log in, and access a dashboard to add, edit, and delete profiles. The application features a dynamic navigation bar, secure access control, and a clean, responsive user interface.
 
-## Description
-
-Bio Blast is a web application that allows users to create, read, update, and delete (CRUD) profiles, including their name, bio, quote, study groups, and hobbies. It features a colorful, card-based UI and a back-end powered by Node.js, Express, and SQLite.
+---
 
 ## Features
 
-- Card-based layout displaying users with name, bio, quote, study groups, and hobbies.
-- Add/edit/delete users, study groups, and hobbies via the UI.
-- Add records via HTTP (e.g., `curl`).
-- Colorful, mobile-friendly UI based on a Figma prototype.
-- Navigation bar with links to "Login" and "Register" pages (placeholder pages for future authentication).
-- Improved error handling with on-screen messages.
+### User Authentication
+- Register with a username (format: `First.Last`, e.g., `Jane.Doe`), email, and password.
+- Log in to access the dashboard.
+- Log out functionality with a success message.
+- Only authenticated users can access the dashboard (`index.html`).
+
+### Dynamic Navigation
+- Shows "Login" and "Register" for unauthenticated users.
+- Shows "Dashboard" and "Logout" for authenticated users.
+
+### Dashboard
+- **Default entry point**: [http://localhost:3002/](http://localhost:3002/)
+- Add new users with name, bio, and quote.
+- View user profiles in card format.
+- Edit or delete user profiles.
+- Add, edit, or delete study groups and hobbies for each user.
+
+### Styling
+- Clean and responsive design.
+- Styled with `style.css`.
+- Includes Font Awesome icons for buttons (e.g., add, edit, delete, login, logout).
+
+---
 
 ## Project Structure
 
-- `frontend/`: HTML, CSS, JavaScript for the UI.
- - `index.html`: Main page for managing user profiles.
- - `login.html`: Placeholder login page.
- - `register.html`: Placeholder registration page.
- - `style.css`: Styles for the UI.
- - `script.js`: JavaScript for CRUD operations.
-- `backend/`: Node.js, Express, SQLite for the server and database.
+```
+dbapplication/
+├── frontend/
+│   ├── index.html     // Dashboard page
+│   ├── login.html     // Login page
+│   ├── register.html  // Registration page
+│   ├── script.js      // Frontend JavaScript functionality
+│   └── style.css      // Application styling
+│
+└── backend/
+    ├── server.js      // Express server
+    └── bio.db         // SQLite database
+```
 
-## Setup and Run
+---
 
-### Prerequisites
+## Setup Instructions
 
-- [Node.js](https://nodejs.org/en/download) (v20.x.x or later recommended)
-- [Git](https://git-scm.com/downloads)
+### 1. Clone the Repository
+```bash
+git clone <repository-url>
+cd Bio-Blast
+```
 
-### Clone the Repository
-
-1. Clone the repository to your local machine:
-git clone https://github.com/YourGitHubUsername/Bio-Blast.git
-cd Bio-Blast/dbapplication
-
-### Install Dependencies
-
-2. Navigate to the `backend/` directory and install dependencies:
-cd backend
+### 2. Install Dependencies
+Navigate to the backend directory and install necessary packages:
+```bash
+cd dbapplication/backend
 npm install
+```
+> This installs `express`, `sqlite3`, and `bcrypt`.
 
-
-### Run the Application
-
-3. Start the server:
+### 3. Start the Server
+```bash
 node server.js
+```
+> The server will start on [http://localhost:3002](http://localhost:3002).
 
-**OR** if you have a root-level `package.json` with a `start` script:
-cd ..
-npm start
+### 4. Access the Application
+- Open your browser and visit [http://localhost:3002/](http://localhost:3002/).
+- If not logged in, you’ll be redirected to the login page.
+- Use the default credentials to log in:
+  - **Username**: `Admin.User`
+  - **Password**: `password123`
+- After logging in, you will be redirected to the dashboard.
 
+### 5. (Optional) Reset the Database
+If you want to reset the database:
+```bash
+del "C:\Users\USER\Documents\Advanced Web Development\Bio Blast\dbapplication\backend\bio.db"
+node server.js
+```
 
+---
 
-4. Open `http://localhost:3001` in your browser to view the app.
+## Recent Changes
 
-## Usage
-**Home**: Access the main page at http://localhost:3001 to manage user profiles.
-**Login**: Navigate to the login page (placeholder) to log in (functionality coming soon).
-**Register**: Navigate to the registration page (placeholder) to create a new account (functionality coming soon).
+- **Dynamic Navigation**: Added a navigation bar that changes based on user authentication.
+- **Logout Functionality**: Implemented logout feature to clear user sessions.
+- **Dashboard Access Control**: Restricted dashboard to logged-in users only.
+- **Default Entry Point**: Set `index.html` as the default page for `http://localhost:3002/`.
 
-### Via the UI
+---
 
-- **Add a User**: Use the "Add New User" form at the top to add a new user with a name, bio, and quote.
-- **Edit a User**: Click the "Edit User" button on a user card to update their details.
-- **Delete a User**: Click the "Delete User" button to remove a user and their associated study groups and hobbies.
-- **Manage Study Groups**: Add or delete study groups for a user using the input and buttons in the "Study Groups" section of each card.
-- **Manage Hobbies**: Add, edit, or delete hobbies for a user using the inputs and buttons in the "Hobbies" section of each card.
+## Future Improvements
 
-### Via `curl`
+- Add server-side session management for more secure authentication.
+- Implement a welcome page before dashboard redirection.
+- Enhance UI with additional styling or animations.
+- Add user profile pictures and more interactive features.
 
-You can also interact with the app using HTTP requests:
-
-- **Add a User**:
-curl -X POST http://localhost:3000/api/users -H "Content-Type: application/json" -d '{"name":"Nia Smith","bio":"Web Developer","quote":"Keep learning!"}'
-
-- **Add a Study Group for a User** (e.g., user_id 4):
-curl -X POST http://localhost:3000/api/study-groups -H "Content-Type: application/json" -d '{"user_id":4,"name":"Code Club"}'
-
-- **Add a Hobby for a User** (e.g., user_id 4):
-curl -X POST http://localhost:3000/api/hobbies -H "Content-Type: application/json" -d '{"user_id":4,"name":"Reading"}'
-
-
-
-## API Endpoints
-
-The back-end provides the following API endpoints for CRUD operations:
-
-- **Users**:
-- `GET /api/users`: Retrieve all users.
-- `POST /api/users`: Create a new user (body: `{ "name": "string", "bio": "string", "quote": "string" }`).
-- `PUT /api/users/:id`: Update a user (body: `{ "name": "string", "bio": "string", "quote": "string" }`).
-- `DELETE /api/users/:id`: Delete a user and their associated study groups and hobbies.
-
-- **Study Groups**:
-- `GET /api/study-groups/:userId`: Retrieve study groups for a specific user.
-- `POST /api/study-groups`: Create a new study group (body: `{ "user_id": number, "name": "string" }`).
-- `DELETE /api/study-groups/:id`: Delete a study group.
-
-- **Hobbies**:
-- `GET /api/hobbies/:user ONLINE**: Retrieve hobbies for a specific user.
-- `POST /api/hobbies`: Create a new hobby (body: `{ "user_id": number, "name": "string" }`).
-- `PUT /api/hobbies/:id`: Update a hobby (body: `{ "name": "string" }`).
-- `DELETE /api/hobbies/:id`: Delete a hobby.
-
-## Tech Stack
-
-- **Front-end**: HTML, CSS, JavaScript
-- Uses a card-based layout with Font Awesome icons for buttons.
-- **Back-end**: Node.js, Express, SQLite
-- Node.js and Express for the server and API routes.
-- SQLite for persistent data storage.
-- **Dependencies**:
-- `express`: For the server and API routes.
-- `sqlite3`: For the SQLite database.
-
-## Deployment (Optional)
-
-You can deploy Bio Blast to a hosting service like Render to make it accessible online:
-
-1. Push your repository to GitHub (already done).
-2. Create a new **Web Service** and connect your GitHub repository.
-3. Configure the service:
- - **Build Command**: `npm install`
- - **Start Command**: `node dbapplication/backend/server.js`
-4. Deploy the app and access it at the provided URL (e.g., `https://bio-blast.onrender.com`).
-
-## Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature-name`).
-3. Make your changes and commit them (`git commit -m "Add your feature"`).
-4. Push to your branch (`git push origin feature/your-feature-name`).
-5. Open a Pull Request on GitHub.
-
-Please ensure your code follows the existing style and includes appropriate documentation.
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is for **educational purposes** and does not include a specific license.
 
-## Contact
+---
 
-For questions or feedback, feel free to reach out:
-- **GitHub**: [obioma-nduka] (https://https://github.com/obioma-nduka)
-- **Email**: obiomanduka1@.com
-
-
-
-
-
-
-
-
-
-
+Would you also like me to generate a quick badge set (like "Built With: Node.js, Express, SQLite") for the top of the README? 🚀  
+It would make it even cleaner!
