@@ -1,36 +1,45 @@
-Of course! Here's your **README.md** based on the information you shared:
+# Taito - Connect Freelancers with Local Customers
+
+**Taito** is a web application that connects freelancers with local customers. Freelancers can register, create profiles, and list their services, while customers can browse freelancers, view services, and contact them. The app features user authentication, role-based dashboards, notifications, and a clean, responsive user interface.
 
 ---
 
-# Bio Blast
+## Table of Contents
 
-**Bio Blast** is a web application designed to manage user profiles, including their bios, quotes, study groups, and hobbies. Users can register, log in, and access a dashboard to add, edit, and delete profiles. The application features a dynamic navigation bar, secure access control, and a clean, responsive user interface.
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Setup Instructions (Local)](#setup-instructions-local)
+- [Test Cases](#test-cases)
+- [Deployment to Heroku](#deployment-to-heroku)
+- [Notes on SQLite with Heroku](#notes-on-sqlite-with-heroku)
+- [Recent Changes](#recent-changes)
+- [Future Improvements](#future-improvements)
+- [License](#license)
 
 ---
 
 ## Features
 
 ### User Authentication
-- Register with a username (format: `First.Last`, e.g., `Jane.Doe`), email, and password.
-- Log in to access the dashboard.
-- Log out functionality with a success message.
-- Only authenticated users can access the dashboard (`index.html`).
+- Register as a **freelancer** or **customer**.
+- Secure login, logout, and role-specific dashboards.
 
 ### Dynamic Navigation
-- Shows "Login" and "Register" for unauthenticated users.
-- Shows "Dashboard" and "Logout" for authenticated users.
+- Navigation links adjust based on authentication state.
 
-### Dashboard
-- **Default entry point**: [http://localhost:3002/](http://localhost:3002/)
-- Add new users with name, bio, and quote.
-- View user profiles in card format.
-- Edit or delete user profiles.
-- Add, edit, or delete study groups and hobbies for each user.
+### Freelancer Dashboard
+- Manage profile and services.
+- Notifications for profile and service actions.
+
+### Customer Dashboard
+- Browse freelancers and services.
+- Placeholder contact functionality.
+
+### Database
+- Uses **SQLite** (note limitations on Heroku).
 
 ### Styling
-- Clean and responsive design.
-- Styled with `style.css`.
-- Includes Font Awesome icons for buttons (e.g., add, edit, delete, login, logout).
+- Clean responsive design with **Font Awesome** icons.
 
 ---
 
@@ -39,20 +48,22 @@ Of course! Here's your **README.md** based on the information you shared:
 ```
 dbapplication/
 ├── frontend/
-│   ├── index.html     // Dashboard page
-│   ├── login.html     // Login page
-│   ├── register.html  // Registration page
-│   ├── script.js      // Frontend JavaScript functionality
-│   └── style.css      // Application styling
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── script.js
+│   └── style.css
 │
 └── backend/
-    ├── server.js      // Express server
-    └── bio.db         // SQLite database
+    ├── server.js
+    ├── taitodb.db
+    ├── package.json
+    └── Procfile
 ```
 
 ---
 
-## Setup Instructions
+## Setup Instructions (Local)
 
 ### 1. Clone the Repository
 ```bash
@@ -60,60 +71,138 @@ git clone <repository-url>
 cd Bio-Blast
 ```
 
-### 2. Install Dependencies
-Navigate to the backend directory and install necessary packages:
+### 2. Install Node.js v20
+
+Use [NVM for Windows](https://github.com/coreybutler/nvm-windows/releases):
+```bash
+nvm install 20
+nvm use 20
+node --version  # Should output v20.x.x
+```
+Or download Node.js v20 directly from [nodejs.org](https://nodejs.org/en/download/).
+
+### 3. Install Dependencies
 ```bash
 cd dbapplication/backend
 npm install
 ```
-> This installs `express`, `sqlite3`, and `bcrypt`.
 
-### 3. Start the Server
+### 4. Start the Server
 ```bash
 node server.js
 ```
-> The server will start on [http://localhost:3002](http://localhost:3002).
+- Server URL: [http://localhost:3002](http://localhost:3002)
 
-### 4. Access the Application
-- Open your browser and visit [http://localhost:3002/](http://localhost:3002/).
-- If not logged in, you’ll be redirected to the login page.
-- Use the default credentials to log in:
-  - **Username**: `Admin.User`
+### 5. Access the Application
+- Default freelancer credentials:
+  - **Username**: `Freelancer.User`
   - **Password**: `password123`
-- After logging in, you will be redirected to the dashboard.
 
-### 5. (Optional) Reset the Database
-If you want to reset the database:
-```bash
-del "C:\Users\USER\Documents\Advanced Web Development\Bio Blast\dbapplication\backend\bio.db"
-node server.js
-```
+---
+
+## Test Cases
+
+### Register and Log In as a Freelancer
+- Create a user: `John.Doe`, `john@example.com`, `password123`, role `freelancer`.
+- Log in and access freelancer dashboard.
+
+### Create a Freelancer Profile
+- Add profile: `John Doe`, `Chicago`, `Web developer with 5 years of experience`, `Rate: 75`.
+
+### Add a Service
+- Service: `Web Development`, `Custom website development`.
+
+### Register and Log In as a Customer
+- Create a user: `Alice.Smith`, `alice@example.com`, `password123`, role `customer`.
+- Browse freelancers.
+
+### Browse Freelancers as a Customer
+- View freelancer profile and services, click "Contact".
+
+---
+
+## Deployment to Heroku
+
+### Prerequisites
+- [Heroku Account](https://signup.heroku.com/)
+- [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+- Git installed
+
+### Deployment Steps
+
+1. Ensure correct settings:
+   - `server.js` uses `process.env.PORT`
+   - `package.json` has:
+     ```json
+     "engines": {
+       "node": "20.x"
+     }
+     ```
+   - Create a `Procfile` with `web: node server.js`.
+
+2. Navigate to project root:
+   ```bash
+   cd "path/to/Bio-Blast"
+   ```
+
+3. Log in to Heroku:
+   ```bash
+   heroku login
+   ```
+
+4. Create and configure app:
+   ```bash
+   heroku create taito-app
+   heroku buildpacks:add https://github.com/timanovsky/subdir-heroku-buildpack.git -a taito-app
+   heroku buildpacks:set heroku/nodejs -a taito-app
+   heroku config:set PROJECT_PATH=dbapplication/backend -a taito-app
+   ```
+
+5. Deploy:
+   ```bash
+   git push heroku main
+   ```
+
+6. Open the app:
+   ```bash
+   heroku open -a taito-app
+   ```
+
+---
+
+## Notes on SQLite with Heroku
+
+⚠️ **Important**:  
+Heroku’s file system is **ephemeral**. SQLite database (`taitodb.db`) will reset on:
+
+- App restarts
+- Dyno changes
+- Deployments
+
+> For production, use **Heroku Postgres** or a similar managed database.
 
 ---
 
 ## Recent Changes
 
-- **Dynamic Navigation**: Added a navigation bar that changes based on user authentication.
-- **Logout Functionality**: Implemented logout feature to clear user sessions.
-- **Dashboard Access Control**: Restricted dashboard to logged-in users only.
-- **Default Entry Point**: Set `index.html` as the default page for `http://localhost:3002/`.
+- Converted project from **Bio Blast** to **Taito**.
+- Moved back to **SQLite** for simpler database setup.
+- Fixed syntax issues by replacing arrow functions.
+- Node.js version pinned to **v20**.
+- Added **dynamic dashboards** and frontend improvements.
+- Configured for **Heroku deployment** with subdirectory support.
 
 ---
 
 ## Future Improvements
 
-- Add server-side session management for more secure authentication.
-- Implement a welcome page before dashboard redirection.
-- Enhance UI with additional styling or animations.
-- Add user profile pictures and more interactive features.
+- Switch to **Heroku Postgres** for production.
+- Add a **real messaging system** for customer-freelancer interaction.
+- Implement **search** and **filter** by service or location.
+- Add **reviews and ratings** for freelancers.
+- Strengthen security with **sessions** or **JWT**.
+- Migrate frontend to **React** (with Vite or Create React App).
+- Reintroduce **arrow functions** when compatible.
 
----
 
-## License
 
-This project is for **educational purposes** and does not include a specific license.
-
----
-
-Would you also like me to generate a quick badge set (like "Built With: Node.js, Express, SQLite") for the top of the README? 🚀  
-It would make it even cleaner!
