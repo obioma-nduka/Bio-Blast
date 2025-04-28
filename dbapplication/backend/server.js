@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const path = require('path');
 
 const app = express();
-const port = 3002;
+const port = process.env.PORT || 3002;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
@@ -13,12 +13,13 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Serve index.html as the default route
-app.get('/', (req, res) => {
+app.get('/', function(req, res) {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// Database setup
-const db = new sqlite3.Database('./bio.db', (err) => {
+// Database setup with a relative path for Heroku
+const dbPath = path.join(__dirname, 'taitodb.db');
+const db = new sqlite3.Database(dbPath, function(err) {
     if (err) {
         console.error('Error connecting to SQLite database:', err.message);
     } else {
@@ -26,100 +27,122 @@ const db = new sqlite3.Database('./bio.db', (err) => {
     }
 });
 
-// Create users table
-db.run(`
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        bio TEXT,
-        quote TEXT
-    )
-`, (err) => {
-    if (err) {
-        console.error('Error creating users table:', err.message);
-    } else {
-        console.log('User table created or already exists');
-    }
-});
+// Create tables if they don't exist
+db.serialize(function() {
+    // Users table (for authentication and roles)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
+            password TEXT NOT NULL,
+            role TEXT CHECK(role IN ('freelancer', 'customer')) NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    `, function(err) {
+        if (err) {
+            console.error('Error creating users table:', err.message);
+        } else {
+            console.log('Users table created or already exists');
+        }
+    });
 
-// Create study_groups table
-db.run(`
-    CREATE TABLE IF NOT EXISTS study_groups (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        name TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-`, (err) => {
-    if (err) {
-        console.error('Error creating study_groups table:', err.message);
-    } else {
-        console.log('Study_groups table created or already exists');
-    }
-});
+    // Freelancer profiles table
+    db.run(`
+        CREATE TABLE IF NOT EXISTS freelancer_profiles (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            name TEXT NOT NULL,
+            location TEXT NOT NULL,
+            description TEXT,
+            rate_per_hour REAL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    `, function(err) {
+        if (err) {
+            console.error('Error creating freelancer_profiles table:', err.message);
+        } else {
+            console.log('Freelancer_profiles table created or already exists');
+        }
+    });
 
-// Create hobbies table
-db.run(`
-    CREATE TABLE IF NOT EXISTS hobbies (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        name TEXT NOT NULL,
-        FOREIGN KEY (user_id) REFERENCES users(id)
-    )
-`, (err) => {
-    if (err) {
-        console.error('Error creating hobbies table:', err.message);
-    } else {
-        console.log('Hobbies table created or already exists');
-    }
-});
+    // Services table (services offered by freelancers)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS services (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            freelancer_id INTEGER,
+            service_name TEXT NOT NULL,
+            description TEXT,
+            FOREIGN KEY (freelancer_id) REFERENCES freelancer_profiles(id)
+        )
+    `, function(err) {
+        if (err) {
+            console.error('Error creating services table:', err.message);
+        } else {
+            console.log('Services table created or already exists');
+        }
+    });
 
-// Create users_credentials table
-db.run(`
-    CREATE TABLE IF NOT EXISTS users_credentials (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT NOT NULL UNIQUE,
-        email TEXT NOT NULL UNIQUE,
-        password TEXT NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-`, async (err) => {
-    if (err) {
-        console.error('Error creating users_credentials table:', err.message);
-    } else {
-        console.log('Users_credentials table created or already exists');
+    // Insert a default freelancer user if not already present
+    const defaultUsername = 'Freelancer.User';
+    const defaultEmail = 'freelancer@example.com';
+    const defaultPassword = 'password123';
 
-        // Insert a default user if not already present
-        const defaultUsername = 'Admin.User';
-        const defaultEmail = 'admin@example.com';
-        const defaultPassword = 'password123';
+    bcrypt.hash(defaultPassword, 10, function(err, hashedPassword) {
+        if (err) {
+            console.error('Error hashing default password:', err.message);
+            return;
+        }
 
-        // Hash the default password
-        const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-
-        db.get('SELECT * FROM users_credentials WHERE username = ?', [defaultUsername], (err, row) => {
+        db.get('SELECT * FROM users WHERE username = ?', [defaultUsername], function(err, row) {
             if (err) {
                 console.error('Error checking for default user:', err.message);
-            } else if (!row) {
+                return;
+            }
+            if (!row) {
                 db.run(
-                    'INSERT INTO users_credentials (username, email, password) VALUES (?, ?, ?)',
-                    [defaultUsername, defaultEmail, hashedPassword],
-                    (err) => {
+                    'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+                    [defaultUsername, defaultEmail, hashedPassword, 'freelancer'],
+                    function(err) {
                         if (err) {
                             console.error('Error inserting default user:', err.message);
-                        } else {
-                            console.log(`Default user '${defaultUsername}' created with email '${defaultEmail}' and password '${defaultPassword}'`);
+                            return;
                         }
+                        console.log(`Default user '${defaultUsername}' created with email '${defaultEmail}' and password '${defaultPassword}'`);
+
+                        // Insert a default freelancer profile for the default user
+                        db.get('SELECT id FROM users WHERE username = ?', [defaultUsername], function(err, user) {
+                            if (err) {
+                                console.error('Error fetching default user ID:', err.message);
+                                return;
+                            }
+                            db.run(
+                                'INSERT INTO freelancer_profiles (user_id, name, location, description, rate_per_hour) VALUES (?, ?, ?, ?, ?)',
+                                [user.id, 'Jane Doe', 'New York', 'Experienced graphic designer', 50.00],
+                                function(err) {
+                                    if (err) {
+                                        console.error('Error inserting default freelancer profile:', err.message);
+                                    } else {
+                                        console.log('Default freelancer profile created');
+                                    }
+                                }
+                            );
+                        });
                     }
                 );
             }
         });
-    }
+    });
 });
 
-// API to get all users
-app.get('/api/users', (req, res) => {
-    db.all('SELECT * FROM users', [], (err, rows) => {
+// API to get all freelancer profiles (for customers to browse)
+app.get('/api/freelancers', function(req, res) {
+    db.all(`
+        SELECT fp.*, u.username 
+        FROM freelancer_profiles fp 
+        JOIN users u ON fp.user_id = u.id
+    `, function(err, rows) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -128,18 +151,35 @@ app.get('/api/users', (req, res) => {
     });
 });
 
-// API to add a new user
-app.post('/api/users', (req, res) => {
-    const { name, bio, quote } = req.body;
-    if (!name) {
-        res.status(400).json({ error: 'Name is required' });
+// API to get services for a freelancer
+app.get('/api/services/:freelancerId', function(req, res) {
+    const freelancerId = req.params.freelancerId;
+    db.all('SELECT * FROM services WHERE freelancer_id = ?', [freelancerId], function(err, rows) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.json(rows);
+    });
+});
+
+// API to add a new freelancer profile
+app.post('/api/freelancer_profiles', function(req, res) {
+    const user_id = req.body.user_id;
+    const name = req.body.name;
+    const location = req.body.location;
+    const description = req.body.description;
+    const rate_per_hour = req.body.rate_per_hour;
+
+    if (!user_id || !name || !location) {
+        res.status(400).json({ error: 'User ID, name, and location are required' });
         return;
     }
 
     db.run(
-        'INSERT INTO users (name, bio, quote) VALUES (?, ?, ?)',
-        [name, bio || null, quote || null],
-        function (err) {
+        'INSERT INTO freelancer_profiles (user_id, name, location, description, rate_per_hour) VALUES (?, ?, ?, ?, ?)',
+        [user_id, name, location, description || null, rate_per_hour || null],
+        function(err) {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
@@ -149,20 +189,23 @@ app.post('/api/users', (req, res) => {
     );
 });
 
-// API to update a user
-app.put('/api/users/:id', (req, res) => {
-    const { name, bio, quote } = req.body;
-    const { id } = req.params;
+// API to update a freelancer profile
+app.put('/api/freelancer_profiles/:id', function(req, res) {
+    const name = req.body.name;
+    const location = req.body.location;
+    const description = req.body.description;
+    const rate_per_hour = req.body.rate_per_hour;
+    const id = req.params.id;
 
-    if (!name) {
-        res.status(400).json({ error: 'Name is required' });
+    if (!name || !location) {
+        res.status(400).json({ error: 'Name and location are required' });
         return;
     }
 
     db.run(
-        'UPDATE users SET name = ?, bio = ?, quote = ? WHERE id = ?',
-        [name, bio || null, quote || null, id],
-        function (err) {
+        'UPDATE freelancer_profiles SET name = ?, location = ?, description = ?, rate_per_hour = ? WHERE id = ?',
+        [name, location, description || null, rate_per_hour || null, id],
+        function(err) {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
@@ -172,60 +215,43 @@ app.put('/api/users/:id', (req, res) => {
     );
 });
 
-// API to delete a user
-app.delete('/api/users/:id', (req, res) => {
-    const { id } = req.params;
+// API to delete a freelancer profile
+app.delete('/api/freelancer_profiles/:id', function(req, res) {
+    const id = req.params.id;
 
-    // First, delete related study groups
-    db.run('DELETE FROM study_groups WHERE user_id = ?', [id], (err) => {
+    // First, delete related services
+    db.run('DELETE FROM services WHERE freelancer_id = ?', [id], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
 
-        // Then, delete related hobbies
-        db.run('DELETE FROM hobbies WHERE user_id = ?', [id], (err) => {
+        // Then, delete the freelancer profile
+        db.run('DELETE FROM freelancer_profiles WHERE id = ?', [id], function(err) {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
-
-            // Finally, delete the user
-            db.run('DELETE FROM users WHERE id = ?', [id], function (err) {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                res.json({ deleted: this.changes });
-            });
+            res.json({ deleted: this.changes });
         });
     });
 });
 
-// API to get study groups for a user
-app.get('/api/study-groups/:userId', (req, res) => {
-    const { userId } = req.params;
-    db.all('SELECT * FROM study_groups WHERE user_id = ?', [userId], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json(rows);
-    });
-});
+// API to add a service
+app.post('/api/services', function(req, res) {
+    const freelancer_id = req.body.freelancer_id;
+    const service_name = req.body.service_name;
+    const description = req.body.description;
 
-// API to add a study group
-app.post('/api/study-groups', (req, res) => {
-    const { user_id, name } = req.body;
-    if (!user_id || !name) {
-        res.status(400).json({ error: 'User ID and name are required' });
+    if (!freelancer_id || !service_name) {
+        res.status(400).json({ error: 'Freelancer ID and service name are required' });
         return;
     }
 
     db.run(
-        'INSERT INTO study_groups (user_id, name) VALUES (?, ?)',
-        [user_id, name],
-        function (err) {
+        'INSERT INTO services (freelancer_id, service_name, description) VALUES (?, ?, ?)',
+        [freelancer_id, service_name, description || null],
+        function(err) {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
@@ -235,10 +261,10 @@ app.post('/api/study-groups', (req, res) => {
     );
 });
 
-// API to delete a study group
-app.delete('/api/study-groups/:id', (req, res) => {
-    const { id } = req.params;
-    db.run('DELETE FROM study_groups WHERE id = ?', [id], function (err) {
+// API to delete a service
+app.delete('/api/services/:id', function(req, res) {
+    const id = req.params.id;
+    db.run('DELETE FROM services WHERE id = ?', [id], function(err) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -247,81 +273,32 @@ app.delete('/api/study-groups/:id', (req, res) => {
     });
 });
 
-// API to get hobbies for a user
-app.get('/api/hobbies/:userId', (req, res) => {
-    const { userId } = req.params;
-    db.all('SELECT * FROM hobbies WHERE user_id = ?', [userId], (err, rows) => {
+// API to get user ID and role by username
+app.get('/api/user/:username', function(req, res) {
+    const username = req.params.username;
+    db.get('SELECT id, role FROM users WHERE username = ?', [username], function(err, row) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json(rows);
-    });
-});
-
-// API to add a hobby
-app.post('/api/hobbies', (req, res) => {
-    const { user_id, name } = req.body;
-    if (!user_id || !name) {
-        res.status(400).json({ error: 'User ID and name are required' });
-        return;
-    }
-
-    db.run(
-        'INSERT INTO hobbies (user_id, name) VALUES (?, ?)',
-        [user_id, name],
-        function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            res.json({ id: this.lastID });
-        }
-    );
-});
-
-// API to update a hobby
-app.put('/api/hobbies/:id', (req, res) => {
-    const { name } = req.body;
-    const { id } = req.params;
-
-    if (!name) {
-        res.status(400).json({ error: 'Name is required' });
-        return;
-    }
-
-    db.run(
-        'UPDATE hobbies SET name = ? WHERE id = ?',
-        [name, id],
-        function (err) {
-            if (err) {
-                res.status(500).json({ error: err.message });
-                return;
-            }
-            res.json({ updated: this.changes });
-        }
-    );
-});
-
-// API to delete a hobby
-app.delete('/api/hobbies/:id', (req, res) => {
-    const { id } = req.params;
-    db.run('DELETE FROM hobbies WHERE id = ?', [id], function (err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
+        if (!row) {
+            res.status(404).json({ error: 'User not found' });
             return;
         }
-        res.json({ deleted: this.changes });
+        res.json({ id: row.id, role: row.role });
     });
 });
 
 // API to register a new user
-app.post('/api/register', async (req, res) => {
-    const { username, email, password } = req.body;
+app.post('/api/register', function(req, res) {
+    const username = req.body.username;
+    const email = req.body.email;
+    const password = req.body.password;
+    const role = req.body.role;
 
     // Validate inputs
-    if (!username || !email || !password) {
-        res.status(400).json({ error: 'Username, email, and password are required' });
+    if (!username || !email || !password || !role) {
+        res.status(400).json({ error: 'Username, email, password, and role are required' });
         return;
     }
 
@@ -339,37 +316,46 @@ app.post('/api/register', async (req, res) => {
         return;
     }
 
-    try {
-        // Check if username already exists
-        db.get('SELECT * FROM users_credentials WHERE username = ?', [username], async (err, row) => {
+    // Validate role
+    if (!['freelancer', 'customer'].includes(role)) {
+        res.status(400).json({ error: 'Role must be either freelancer or customer' });
+        return;
+    }
+
+    // Check if username already exists
+    db.get('SELECT * FROM users WHERE username = ?', [username], function(err, row) {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (row) {
+            res.status(400).json({ error: 'Username already exists' });
+            return;
+        }
+
+        // Check if email already exists
+        db.get('SELECT * FROM users WHERE email = ?', [email], function(err, row) {
             if (err) {
                 res.status(500).json({ error: err.message });
                 return;
             }
             if (row) {
-                res.status(400).json({ error: 'Username already exists' });
+                res.status(400).json({ error: 'Email already exists' });
                 return;
             }
 
-            // Check if email already exists
-            db.get('SELECT * FROM users_credentials WHERE email = ?', [email], async (err, row) => {
+            // Hash the password
+            bcrypt.hash(password, 10, function(err, hashedPassword) {
                 if (err) {
-                    res.status(500).json({ error: err.message });
+                    res.status(500).json({ error: 'Error hashing password' });
                     return;
                 }
-                if (row) {
-                    res.status(400).json({ error: 'Email already exists' });
-                    return;
-                }
-
-                // Hash the password
-                const hashedPassword = await bcrypt.hash(password, 10);
 
                 // Insert the new user
                 db.run(
-                    'INSERT INTO users_credentials (username, email, password) VALUES (?, ?, ?)',
-                    [username, email, hashedPassword],
-                    (err) => {
+                    'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
+                    [username, email, hashedPassword, role],
+                    function(err) {
                         if (err) {
                             res.status(500).json({ error: err.message });
                             return;
@@ -379,14 +365,13 @@ app.post('/api/register', async (req, res) => {
                 );
             });
         });
-    } catch (error) {
-        res.status(500).json({ error: 'Error registering user' });
-    }
+    });
 });
 
 // API to log in a user
-app.post('/api/login', (req, res) => {
-    const { username, password } = req.body;
+app.post('/api/login', function(req, res) {
+    const username = req.body.username;
+    const password = req.body.password;
 
     // Validate inputs
     if (!username || !password) {
@@ -395,7 +380,7 @@ app.post('/api/login', (req, res) => {
     }
 
     // Find the user by username
-    db.get('SELECT * FROM users_credentials WHERE username = ?', [username], async (err, row) => {
+    db.get('SELECT * FROM users WHERE username = ?', [username], function(err, row) {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
@@ -407,17 +392,22 @@ app.post('/api/login', (req, res) => {
         }
 
         // Compare the password with the hashed password
-        const match = await bcrypt.compare(password, row.password);
-        if (!match) {
-            res.status(401).json({ error: 'Invalid username or password' });
-            return;
-        }
+        bcrypt.compare(password, row.password, function(err, match) {
+            if (err) {
+                res.status(500).json({ error: 'Error comparing passwords' });
+                return;
+            }
+            if (!match) {
+                res.status(401).json({ error: 'Invalid username or password' });
+                return;
+            }
 
-        res.json({ message: 'Login successful', username: row.username });
+            res.json({ message: 'Login successful', username: row.username, role: row.role });
+        });
     });
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
+app.listen(port, function() {
+    console.log(`Server running on port ${port}`);
 });

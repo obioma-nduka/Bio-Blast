@@ -1,330 +1,130 @@
 body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    min-height: 100vh;
+    background-color: #f4f4f4;
 }
 
-/* Navigation Bar Styles */
 .navbar {
-    background: #6B00FF;
+    background-color: #333;
     color: white;
-    padding: 15px 30px;
+    padding: 10px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.navbar .logo h1 {
-    margin: 0;
-    font-size: 24px;
-}
-
-.navbar .nav-links a {
-    color: white;
-    text-decoration: none;
-    margin-left: 20px;
-    font-size: 16px;
-    transition: color 0.3s;
-}
-
-.navbar .nav-links a:hover {
-    color: #FFD700;
-}
-
-main {
-    max-width: 1200px;
-    margin: 30px auto;
-    padding: 0 20px;
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center content */
-}
-
-/* Enhanced Auth Form Styles (Login and Register) */
-.auth-form {
-    background: white;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-    max-width: 400px;
-    width: 100%;
-    transition: transform 0.2s ease;
-}
-
-.auth-form:hover {
-    transform: translateY(-3px);
-}
-
-.auth-form h2 {
-    color: #6B00FF;
-    text-align: center;
-    margin-bottom: 25px;
-    font-size: 28px;
+.navbar-brand {
+    font-size: 1.5em;
     font-weight: bold;
 }
 
+.navbar-links a {
+    color: white;
+    margin-left: 20px;
+    text-decoration: none;
+}
+
+.navbar-links a:hover {
+    text-decoration: underline;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 5px;
+}
+
+h2, h3, h4, h5 {
+    color: #333;
+}
+
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: bold;
-    color: #333;
-    font-size: 16px;
+    margin-bottom: 5px;
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea,
+.form-group select {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
-.form-group input:focus {
-    outline: none;
-    border-color: #6B00FF;
-    box-shadow: 0 0 5px rgba(107, 0, 255, 0.3);
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
 }
 
-.auth-button, .add {
-    background: #6B00FF;
+.btn {
+    background-color: #4CAF50;
     color: white;
+    padding: 10px 15px;
     border: none;
-    padding: 12px 25px;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin: 20px auto 10px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease;
+    gap: 5px;
 }
 
-.auth-button:hover, .add:hover {
-    background: #5600CC;
-    transform: scale(1.05);
+.btn:hover {
+    background-color: #45a049;
 }
 
-.auth-button:active, .add:active {
-    transform: scale(0.95);
+.btn-danger {
+    background-color: #f44336;
 }
 
-.auth-form p {
-    text-align: center;
-    margin-top: 15px;
-    color: #666;
-    font-size: 14px;
+.btn-danger:hover {
+    background-color: #da190b;
 }
 
-.auth-form p a {
-    color: #6B00FF;
-    text-decoration: none;
-    font-weight: bold;
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    display: none;
 }
 
-.auth-form p a:hover {
-    text-decoration: underline;
-    color: #5600CC;
+.notification.success {
+    background-color: #4CAF50;
+    color: white;
 }
 
-/* Enhanced Add User Form */
-.add-user-form {
-    background: white;
-    padding: 30px; /* Match auth-form padding */
-    border-radius: 12px; /* Match auth-form border-radius */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Match auth-form shadow */
-    max-width: 400px; /* Match auth-form width */
-    width: 100%;
-    margin-bottom: 40px; /* Increased spacing */
-    transition: transform 0.2s ease; /* Add hover animation */
+.notification.error {
+    background-color: #f44336;
+    color: white;
 }
 
-.add-user-form:hover {
-    transform: translateY(-3px); /* Match auth-form hover effect */
+.freelancer-card {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background-color: #fafafa;
 }
 
-.add-user-form h2 {
-    color: #6B00FF;
-    text-align: center;
-    margin-bottom: 25px; /* Match auth-form spacing */
-    font-size: 28px; /* Match auth-form heading */
-    font-weight: bold;
-}
-
-/* Enhanced User Card */
-.user-card {
-    background: white;
-    border-radius: 12px; /* Match auth-form border-radius */
-    padding: 25px; /* Increased padding */
-    margin-bottom: 25px; /* Increased spacing */
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15); /* Match auth-form shadow */
-    width: 100%;
-    max-width: 600px; /* Wider cards for better readability */
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smoother hover effect */
-}
-
-.user-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
-}
-
-.user-card h2 {
-    color: #6B00FF;
-    margin-top: 0;
-    font-size: 24px; /* Larger heading */
-    font-weight: bold;
-    margin-bottom: 10px; /* Better spacing */
-}
-
-.user-card p {
-    margin: 8px 0; /* Better spacing */
-    color: #333; /* Darker text for readability */
-    font-size: 16px; /* Larger text */
-    line-height: 1.5; /* Better readability */
-}
-
-.section {
-    margin: 25px 0; /* Increased spacing */
-}
-
-.section h3 {
-    color: #333;
-    border-bottom: 2px solid #6B00FF;
-    padding-bottom: 5px;
-    font-size: 20px; /* Larger heading */
-    margin-bottom: 15px; /* Better spacing */
-}
-
-.section ul {
-    list-style: none;
+ul {
+    list-style-type: none;
     padding: 0;
 }
 
-.section ul li {
-    background: #f9f9f9;
-    padding: 12px 15px; /* Increased padding */
-    margin: 8px 0; /* Better spacing */
-    border-radius: 5px;
+ul li {
+    padding: 5px 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 16px; /* Larger text */
-    color: #333; /* Darker text */
-    transition: background 0.3s ease; /* Smooth background transition */
-}
-
-.section ul li:hover {
-    background: #ececec; /* Subtle hover effect */
-}
-
-.section input {
-    padding: 10px; /* Increased padding */
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-right: 10px;
-    flex: 1;
-    font-size: 16px; /* Larger text */
-}
-
-.button-group {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 15px; /* Better spacing */
-}
-
-.edit, .delete, .add {
-    background: #6B00FF;
-    color: white;
-    border: none;
-    padding: 10px 20px; /* Increased padding */
-    border-radius: 5px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px; /* Slightly larger text */
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease; /* Add transform animation */
-}
-
-.edit:hover, .add:hover {
-    background: #5600CC;
-    transform: scale(1.05); /* Slight scale-up on hover */
-}
-
-.edit:active, .add:active {
-    transform: scale(0.95); /* Slight press effect */
-}
-
-.delete {
-    background: #FF4D4D;
-}
-
-.delete:hover {
-    background: #CC0000;
-    transform: scale(1.05); /* Add hover animation */
-}
-
-.delete:active {
-    transform: scale(0.95); /* Add press effect */
-}
-
-.error-message {
-    background: #ff4d4d;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 20px 0;
-    display: none;
-    text-align: center;
-}
-
-.success-message {
-    background: #28a745;
-    color: white;
-    padding: 10px;
-    border-radius: 8px;
-    margin: 20px 0;
-    display: none;
-    text-align: center;
-}
-
-@media (max-width: 600px) {
-    .navbar {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .navbar .nav-links a {
-        margin-left: 10px;
-    }
-
-    .section ul li {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .section input {
-        margin-bottom: 10px;
-    }
-
-    .button-group {
-        flex-direction: column;
-    }
-
-    .auth-form, .add-user-form, .user-card {
-        padding: 20px; /* Slightly less padding on mobile */
-        margin: 20px; /* Ensure it doesn't touch the edges */
-    }
 }

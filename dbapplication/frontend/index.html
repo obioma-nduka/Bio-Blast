@@ -3,95 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bio Blast</title>
+    <title>Taito - Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <script>
-        // Check authentication as early as possible
-        (function() {
-            const loggedInUser = localStorage.getItem("loggedInUser");
-            if (!loggedInUser) {
-                // Redirect to login.html with a message
-                window.location.href = "login.html?redirectReason=unauthenticated";
-            }
-        })();
-    </script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">
-            <h1>Bio Blast</h1>
-        </div>
-        <div class="nav-links">
-            <!-- Navigation links will be dynamically added -->
+        <div class="navbar-brand">Taito</div>
+        <div class="navbar-links" id="navbarLinks">
+            <!-- Navigation links will be dynamically updated -->
         </div>
     </nav>
 
-    <main>
-        <section class="add-user-form">
-            <h2>Add New User</h2>
-            <div class="form-group">
-                <label for="name-input">Name</label>
-                <input type="text" id="name-input" placeholder="Enter name">
-            </div>
-            <div class="form-group">
-                <label for="bio-input">Bio</label>
-                <input type="text" id="bio-input" placeholder="Enter bio">
-            </div>
-            <div class="form-group">
-                <label for="quote-input">Quote</label>
-                <input type="text" id="quote-input" placeholder="Enter quote">
-            </div>
-            <button class="add" onclick="addUser()"><i class="fas fa-plus"></i> Add User</button>
-        </section>
+    <div class="container" id="dashboard">
+        <!-- Dashboard content will be dynamically loaded -->
+    </div>
 
-        <div id="error-message" class="error-message"></div>
-        <div id="success-message" class="success-message"></div>
-
-        <section id="users-list"></section>
-    </main>
+    <div id="notification" class="notification"></div>
 
     <script src="script.js"></script>
     <script>
-        // Function to render the navigation bar based on login status
-        function renderNavigation() {
-            const loggedInUser = localStorage.getItem("loggedInUser");
-            const navLinks = document.querySelector(".nav-links");
+        // Check if user is logged in and load the appropriate dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            const username = localStorage.getItem('username');
+            const role = localStorage.getItem('role');
 
-            if (loggedInUser) {
-                navLinks.innerHTML = `
-                    <a href="index.html">Dashboard</a>
-                    <a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                `;
-            } else {
-                navLinks.innerHTML = `
-                    <a href="login.html">Login</a>
-                    <a href="register.html">Register</a>
-                `;
+            if (!username || !role) {
+                window.location.href = 'login.html';
+                return;
             }
-        }
 
-        // Function to log out
-        function logout() {
-            localStorage.removeItem("loggedInUser");
-            const successDiv = document.getElementById("success-message");
-            if (successDiv) {
-                successDiv.textContent = "Logged out successfully!";
-                successDiv.style.display = "block";
-                setTimeout(() => {
-                    successDiv.style.display = "none";
-                }, 5000);
+            updateNavbar(username);
+            if (role === 'freelancer') {
+                loadFreelancerDashboard();
+            } else if (role === 'customer') {
+                loadCustomerDashboard();
             }
-            setTimeout(() => {
-                window.location.href = "login.html";
-            }, 1000);
-        }
-
-        // Call renderNavigation on page load
-        document.addEventListener("DOMContentLoaded", () => {
-            renderNavigation();
-            // Since the early check already redirected unauthenticated users, we can safely load users
-            loadUsers();
         });
     </script>
 </body>
